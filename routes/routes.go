@@ -21,4 +21,10 @@ var webRoutes = WebRoutes{
 		"/",
 		handlers.Message,
 	},
+	{
+		"home",
+		"GET",
+		"/home",
+		handlers.Hello,
+	},
 }
