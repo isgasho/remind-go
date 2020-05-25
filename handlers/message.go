@@ -54,7 +54,7 @@ func HandleMessage(content string) string {
 	mmp := myexp.FindAllStringSubmatch(content, -1)
 	fmt.Println(mmp)
 	if mmp == nil {
-		return "小姐姐，你这个时间格式有点为难我了"
+		return "我得再升升级才能满足你的时间格式，如果是小姐姐需要的话我马上升级"
 	}
 	//最多只有三位 时 分 秒
 	if len(mmp) > 3 {
