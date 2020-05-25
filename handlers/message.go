@@ -96,7 +96,11 @@ func HandleMessage(content string) string {
 		return "我得再升升级才能满足你的时间格式，如果是小姐姐需要的话我马上升级"
 	}
 	var diff time.Duration
+
 	diff = isCreateTimerForSendNotice(lastId, realDate, createdTime, phone[0])
+	if diff.Minutes() < 0 {
+		return fmt.Sprintf("过期的时间就别让我通知了,给我省条短信吧")
+	}
 	if diff.Hours() < 1 {
 		return fmt.Sprintf("%s分钟后短信提醒内容:%s", Decimal(diff.Minutes()), content)
 	}
