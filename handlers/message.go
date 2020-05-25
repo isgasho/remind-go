@@ -5,7 +5,9 @@ import (
 	"log"
 	"regexp"
 	"remind-go/models"
+	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 var timeDay = map[string]string{
@@ -15,15 +17,10 @@ var timeDay = map[string]string{
 	"大后天": getDateString(3),
 }
 
-//var timeHMS = map[string]string{
-//	"个月": getDateString(0),
-//	"小时": getDateString(1),
-//	"分钟": getDateString(2),
-//	"分":  getDateString(2),
-//	"秒":  getDateString(3),
-//	"周":  getDateString(3),
-//	"天":  getDateString(3),
-//}
+var timeHMS = map[string]bool{
+	"点": true,
+	"分": true,
+}
 
 type contentRegexp struct {
 	*regexp.Regexp
@@ -54,8 +51,6 @@ func HandleMessage(content string) string {
 	if phone == nil {
 		return "不留下联系方式我咋么联系上您"
 	}
-	//手机号
-	fmt.Println(phone[0])
 	mmp := myexp.FindAllStringSubmatch(content, -1)
 	fmt.Println(mmp)
 	if mmp == nil {
@@ -65,22 +60,32 @@ func HandleMessage(content string) string {
 	if len(mmp) > 3 {
 		mmp = mmp[:3]
 	}
-
 	var realDate string
 	for _, item := range mmp {
-		//今天明天后台大后天
+		//今天明天大后天
 		if _, ok := timeDay[item[0]]; ok {
 			realDate = timeDay[item[0]]
+			continue
+		}
+		//本身日期格式 2020-05-20 13:00
+		if realDate == "" {
+			realDate = item[0]
 		} else {
-			if realDate == "" {
-				realDate = item[0]
-			} else {
-				realDate = realDate + " " + item[0]
+			lateTime := item[0]
+			//19点20分
+			if timeHMS[lateTime[utf8.RuneCountInString(lateTime)-1:]] {
+				var numberTime string = lateTime[0 : utf8.RuneCountInString(lateTime)-1]
+				if lateTime[utf8.RuneCountInString(lateTime)-1:] == "分" {
+					realDate = strings.Replace(realDate, ":00", ":"+numberTime, 1)
+					continue
+				}
+				realDate += " " + numberTime + ":00"
+				continue
 			}
+			realDate = realDate + " " + lateTime
 		}
 	}
 	fmt.Println(realDate)
-
 	cstSh, _ := time.LoadLocation("Asia/Shanghai")
 	createdTime := time.Now().In(cstSh)
 
@@ -88,13 +93,14 @@ func HandleMessage(content string) string {
 	lastId, err := models.CreateToDo(createdTime, content, phone[0], realDate)
 	if err != nil {
 		log.Println(err.Error())
+		return "我得再升升级才能满足你的时间格式，如果是小姐姐需要的话我马上升级"
 	}
 	var diff time.Duration
 	diff = isCreateTimerForSendNotice(lastId, realDate, createdTime, phone[0])
 	if diff.Hours() < 1 {
-		return fmt.Sprintf("%s分钟后短信提醒内容:%s,请注意查收", Decimal(diff.Minutes()), content)
+		return fmt.Sprintf("%s分钟后短信提醒内容:%s", Decimal(diff.Minutes()), content)
 	}
-	return fmt.Sprintf("%s小时后短信提醒内容:%s，请注意查收", Decimal(diff.Hours()), content)
+	return fmt.Sprintf("%s小时后短信提醒内容:%s", Decimal(diff.Hours()), content)
 }
 
 //通知时间小于现在的3小时，直接搞个定时器
