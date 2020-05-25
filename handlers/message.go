@@ -89,18 +89,21 @@ func HandleMessage(content string) string {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	isCreateTimerForSendNotice(lastId, realDate, createdTime, phone[0])
-	return "ahha"
+	var diff time.Duration
+	diff = isCreateTimerForSendNotice(lastId, realDate, createdTime, phone[0])
+	if diff.Hours() < 1 {
+		return fmt.Sprintf("%s分钟后短信提醒内容:%s,请注意查收", Decimal(diff.Minutes()), content)
+	}
+	return fmt.Sprintf("%s小时后短信提醒内容:%s，请注意查收", Decimal(diff.Hours()), content)
 }
 
 //通知时间小于现在的3小时，直接搞个定时器
-func isCreateTimerForSendNotice(lastId int64, sendTime string, createdTime time.Time, phone string) {
+func isCreateTimerForSendNotice(lastId int64, sendTime string, createdTime time.Time, phone string) time.Duration {
 	log.Println(sendTime)
 	cstSh, _ := time.LoadLocation("Asia/Shanghai")
 	noticeTime, err := time.ParseInLocation("2006-01-02 15:04:05", sendTime+":00", cstSh)
 	if err != nil {
 		fmt.Println(err.Error())
-		return
 	}
 	diff := noticeTime.Sub(createdTime)
 	//直接给他一个定时器 执行 即使下一个断续器启动 检索信息的时候这条通知已经标注已通知了
@@ -114,4 +117,5 @@ func isCreateTimerForSendNotice(lastId int64, sendTime string, createdTime time.
 			noticePhone.SendNotice(lastId)
 		}()
 	}
+	return diff
 }
