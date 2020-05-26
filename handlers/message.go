@@ -120,6 +120,7 @@ func isCreateTimerForSendNotice(lastId int64, sendTime string, createdTime time.
 	if diff.Hours() < 3 && diff.Hours() > 0 {
 		var noticePhone = &Phone{}
 		noticePhone.Phone = phone
+		noticePhone.Id = lastId
 		go func() {
 			//到点执行
 			timer := time.NewTimer(diff)

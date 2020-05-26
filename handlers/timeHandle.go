@@ -38,6 +38,7 @@ func Scheduler() {
 			}
 			email.Body = todo.Content
 			phone.Phone = todo.Phone
+			phone.Id = todo.Id
 			go func(todo2 models.Todo, email2 *Email, phone2 *Phone) {
 				SendEmailOrPhone(todo2, email2, phone2)
 			}(todo, email, phone)

@@ -18,6 +18,9 @@ func StartWeb(port string) {
 	go func() {
 		handlers.Scheduler()
 	}()
+	go func() {
+		handlers.HandlerErrNotice()
+	}()
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Println("error:" + err.Error())

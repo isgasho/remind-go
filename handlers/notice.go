@@ -25,6 +25,7 @@ type Email struct {
 }
 type Phone struct {
 	Phone string
+	Id    int64
 }
 
 var timer *time.Timer
@@ -37,7 +38,7 @@ func SendEmailOrPhone(todo models.Todo, email *Email, phone *Phone) {
 	diff := noticeTime.Sub(now)
 	timer = time.NewTimer(diff)
 	<-timer.C
-	//暂时没接
+	//暂时关闭邮箱提醒
 	//email.SendNotice()
 	phone.SendNotice(todo.Id)
 	log.Println("此次发送的手机号是:%d", phone)
@@ -66,6 +67,7 @@ func (phone *Phone) SendNotice(id int64) {
 		config.Teng.SECRETID,
 		config.Teng.SecretKey,
 	)
+
 	cpf := profile.NewClientProfile()
 	/* SDK 默认使用 POST 方法
 	 * 如需使用 GET 方法，可以在此处设置，但 GET 方法无法处理较大的请求 */
@@ -99,6 +101,7 @@ func (phone *Phone) SendNotice(id int64) {
 	response, err := client.SendSms(request)
 	// 处理异常
 	if _, ok := err.(*errors.TencentCloudSDKError); ok {
+		SendHandleChannel(ErrNoticeChannel, *phone)
 		fmt.Printf("An API error has returned: %s", err)
 		return
 	}
