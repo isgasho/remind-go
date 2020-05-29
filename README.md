@@ -3,7 +3,7 @@
 
 ### 对此项目介绍
 
-[remind-go](https://mp.weixin.qq.com/s?__biz=MzU3Mzc5NTU2MQ==&tempkey=MTA2Ml82ZW5LeXM2V0ZWYUxFWERSMWRoUHYzbzFKZ2dnSWg0bzhmamU5NHVvTERlaFJteDRFTG1RMW1HQ2phT3U2bDcyVmhUVDV6cnpnY19kanVrbXJpUHByVHFTazVZVGVkR0V6YWlScDI1MnkwaWpnTEFyeEZzRkxKVi1ha3J3SmdnemtqTkpyWFB2ZmJrMmJTXzhrSHpyVmxBc1NlUlZIOVEzVXBPbnpBfn4%3D&chksm=7d3d7b794a4af26f6ad776c2ea24bd724e8e9a766284a1825e64d447a7006f44a6733d1cd8a4#rd)
+[一段骚操作 我又搞出了啥](https://learnku.com/articles/45034)
 
 ### 环境
 **go环境自行安装**
